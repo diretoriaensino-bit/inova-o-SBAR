@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador SBAR | Inovação Hospitalar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Tudo que já estava lindo continua aqui */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #f0f4f8; color: #334155; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #ffffff; width: 100%; max-width: 550px; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #0f172a; font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+        .header p { color: #64748b; font-size: 0.95rem; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 1rem; color: #1e293b; background-color: #f8fafc; transition: all 0.3s ease; }
+        input:focus, textarea:focus { outline: none; border-color: #2563eb; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        textarea { resize: vertical; min-height: 80px; }
+        
+        /* --- A MÁGICA DO BOTÃO E DO SPINNER COMEÇA AQUI --- */
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            /* Usamos Flexbox para alinhar a bolinha e o texto no meio do botão */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Espaço entre a bolinha e o texto */
+        }
+
+        button:hover { background-color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3); }
+        button:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* O desenho do Spinner */
+        .spinner {
+            display: none; /* Escondido por padrão */
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3); /* Anel transparente */
+            border-radius: 50%; /* Deixa redondo */
+            border-top-color: #ffffff; /* A ponta branca que vai girar */
+            animation: girar 1s ease-in-out infinite; /* O motorzinho da animação */
+        }
+
+        /* A regra de animação (0 a 360 graus) */
+        @keyframes girar {
+            to { transform: rotate(360deg); }
+        }
+        /* --------------------------------------------------- */
+
+        #msg { margin-top: 20px; text-align: center; font-weight: 500; color: #059669; }
+        .footer-link { display: block; text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+        .footer-link a { color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.3s ease; }
+        .footer-link a:hover { color: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Simulador SBAR</h1>
+            <p>Treinamento de Comunicação Clínica Integrada</p>
+        </div>
+        
+        <form id="meuForm">
+            <div class="form-group">
+                <label for="email">E-mail do Aluno / Funcionário</label>
+                <input type="email" id="email" placeholder="nome@hospital.com.br" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="s">Situação (S)</label>
+                <textarea id="s" placeholder="O que está acontecendo agora com o paciente?" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="b">Histórico (B)</label>
+                <textarea id="b" placeholder="Qual o contexto clínico e antecedentes?" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="a">Avaliação (A)</label>
+                <textarea id="a" placeholder="Qual o problema principal na sua avaliação?" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="r">Recomendação (R)</label>
+                <textarea id="r" placeholder="O que você sugere fazer imediatamente?" required></textarea>
+            </div>
+
+            <button type="submit" id="btn">
+                <div class="spinner" id="spinner"></div>
+                <span id="btn-text">Enviar para o Preceptor IA</span>
+            </button>
+        </form>
+        
+        <p id="msg"></p>
+        
+        <div class="footer-link">
+            <a href="/dashboard">Acesso Restrito: Painel do Professor &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('meuForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn');
+            const btnText = document.getElementById('btn-text');
+            const spinner = document.getElementById('spinner');
+            const msg = document.getElementById('msg');
+            
+            // O que acontece quando clica:
+            btn.disabled = true;
+            btnText.innerText = "Analisando SBAR...";
+            spinner.style.display = "block"; // Faz o spinner aparecer!
+            msg.innerText = "";
+            msg.style.color = "#059669"; 
+
+            try {
+                const resp = await fetch('/api/sbar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_email: document.getElementById('email').value,
+                        situation: document.getElementById('s').value,
+                        background: document.getElementById('b').value,
+                        assessment: document.getElementById('a').value,
+                        recommendation: document.getElementById('r').value
+                    })
+                });
+                const data = await resp.json();
+                msg.innerText = "✅ " + data.message;
+            } catch (error) {
+                msg.innerText = "❌ Ocorreu um erro na rede. Tente novamente.";
+                msg.style.color = "#ef4444"; 
+            } finally {
+                // O que acontece quando termina:
+                btnText.innerText = "Enviar para o Preceptor IA";
+                spinner.style.display = "none"; // Esconde o spinner
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
