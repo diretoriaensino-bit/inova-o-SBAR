@@ -1,0 +1,12 @@
+# 1. Pegue no Google AI Studio
+GEMINI_API_KEY=AIzaSyD1w-O9aNGeWrcjcTCPGwAq2XdkLk90YG0
+
+# 2. Seu e-mail e a "Senha de App" de 16 letras que você criou no Google
+SMTP_USER=diretoriaensino@husf.org.br
+SMTP_PASSWORD=ubjt wgrz ifwg pcvy
+
+# 3. Senha que você criou no Supabase (não é a da conta, é a do banco!)
+DB_PASSWORD=Dephusf2026
+
+# 4. Copie do Supabase (Settings > Database > Host)
+DB_HOST=aws-1-us-east-1.pooler.supabase.com
